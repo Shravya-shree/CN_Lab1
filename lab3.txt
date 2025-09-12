@@ -1,0 +1,47 @@
+package com.smvitm.cnlab;
+
+import java.util.Arrays;
+
+public class SlidingWindowsProtocol {
+
+    private int windowsize;
+    private int[] frames;
+    private boolean[] ack;
+
+    public SlidingWindowsProtocol(int windowsize, int frameCount) {
+        this.windowsize = windowsize;
+        this.frames = new int[frameCount];
+        this.ack = new boolean[frameCount];
+        for (int i = 0; i < frameCount; i++) {
+            frames[i] = i;
+            ack[i] = false;
+        }
+    }
+
+    public void SendFrames() {
+        int SendIndex = 0;
+        while (SendIndex < frames.length) {
+            for (int i = 0; i < windowsize && (SendIndex + i) < frames.length; i++) {
+                System.out.println("sending frame:" + frames[SendIndex + i]);
+            }
+            for (int i = 0; i < windowsize && (SendIndex + i) < frames.length; i++) {
+                ack[SendIndex + i] = receiveAck(SendIndex + i);
+            }
+            while (SendIndex < frames.length && ack[SendIndex]) {
+                SendIndex++;
+            }
+        }
+    }
+
+    private boolean receiveAck(int frame) {
+        System.out.println("receiving ack for frame:" + frame);
+        return true;
+    }
+
+    public static void main(String[] args) {
+        int windowsize = 4;
+        int frameCount = 10;
+        SlidingWindowsProtocol swp = new SlidingWindowsProtocol(windowsize, frameCount);
+        swp.SendFrames();
+    }
+}
